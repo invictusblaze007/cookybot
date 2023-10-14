@@ -92,7 +92,6 @@ pinecone-client @ git+https://github.com/pinecone-io/pinecone-python-client.git@
 pipreqs==0.4.13
 plotly==5.17.0
 portalocker==2.8.2
-portaudio
 protobuf==4.23.4
 pyarrow==12.0.1
 PyAudio
