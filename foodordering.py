@@ -9,6 +9,8 @@ from utils import find_match
 from utils import get_conversation_string
 from streamlit_chat import message
 from streamlit_option_menu import option_menu
+from streamlit_extras.stylable_container import stylable_container
+import random
 
 api_key=st.secrets["GPT_API_KEY"]
 
@@ -27,24 +29,22 @@ from langchain.prompts import(
 
 
 
-
-
 def chatbot():
-    greetings=["Hi, I'm Cooky! How can I assist you today?",
-             "Hello there! Cooky here, ready to help.",
-             "Hey, it's Cooky! What can I do for you?",
-             "Greetings! I'm Cooky, your friendly chatbot. How may I assist you?"]
+    greetings=["Hi, I'm Invictus! How can I assist you today?",
+             "Hello there! Invictus here, ready to help.",
+             "Hey, it's Invictus! What can I do for you?",
+             "Greetings! I'm Invictus, your friendly chatbot. How may I assist you?"]
     def greet_user():
         st.snow()
-    st.header("Cooky Resturant")
+        return random.choice(greetings)
+        
+    st.header("Cookie Bot")
     #intializing session_states
     if "responses" not in st.session_state:
         st.session_state.responses=[]
         st.session_state.responses.append(greet_user())
     if "requests" not in st.session_state:
         st.session_state.requests=[]
-    if "query" not in st.session_state:
-        st.session_state.query=""
     if "buffer_memory" not in st.session_state:
         st.session_state.buffer_memory=ConversationBufferWindowMemory(k=7,return_messages=True)
     llm=ChatOpenAI(model="gpt-3.5-turbo",openai_api_key=api_key)
@@ -79,9 +79,9 @@ def chatbot():
             st.error(f"Sorry, there was an error with the request: {e}")
             return ""
     # Voice Input Button
-    voice_input_button = st.toggle("Voice Input",key="voice_input_button_1")
+    voice_input_button = st.toggle("Voice Input",key="voice_input_button")
     # Listen Button
-    listen_button = st.button("Listen")
+    listen_button = st.button("Ask via Voice")
     # Enable the voice input button when the voice text is not empty
     if voice_text != "":
         voice_input_button = True
@@ -102,11 +102,9 @@ def chatbot():
             user_input = query
             st.session_state.requests.append(user_input)
             st.session_state.responses.append(response)
-            user_input=st.empty()
-            st.session_state.query=""
-                
-
             
+                
+    
         with response_container:
             if st.session_state['responses']:
 
@@ -114,8 +112,9 @@ def chatbot():
                     message(st.session_state['responses'][i],key=str(i),
                             logo=("https://t3.ftcdn.net/jpg/03/22/38/32/360_F_322383277_xcXz1I9vOFtdk7plhsRQyjODj08iNSwB.jpg"))
                     if i < len(st.session_state['requests']):
-                        message(st.session_state["requests"][i], is_user=True,key=str(i)+ '_user')
-
+                        message(st.session_state["requests"][i], is_user=True,key=str(i)+ '_user',
+                                logo="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN4oQnEnXNqD9oPxyinMmfcUBkyF-jHhKWog&usqp=CAU")
+            
 
 def food_ordering(): 
     st.header("Food Ordering")
@@ -154,10 +153,12 @@ def food_ordering():
             else:
                 st.error('Failed to send the order.')
 
-
+def clear_conversation():
+    st.session_state.responses=[]
 def side_bar():
     
     with st.sidebar:
+        
         selected=option_menu(
         menu_title="Menu",
         menu_icon="cast",
@@ -165,6 +166,28 @@ def side_bar():
         icons=["robot","circle-fill","house"],
         default_index=0,
     )
+        
+        with stylable_container(
+            key="black_button",
+            css_styles=[
+                """
+                button {
+                    border: 1px solid #fff;
+                    border-radius: 10px;
+                    color: #fff;
+                    background-color: #262730;
+                }
+                """,
+                """
+                button:hover {
+                    border-color: skyblue;
+                    color : skyblue
+                }
+                """,
+            ],
+        ):
+            st.button("Clear Conversation", on_click=clear_conversation)
+        st.link_button(url="https://mcdonalds.com.pk/",label="Cookie Website")
 
     if selected == "Bot":
         chatbot()
