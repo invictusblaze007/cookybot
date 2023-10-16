@@ -15,8 +15,8 @@ import random
 api_key=st.secrets["GPT_API_KEY"]
 
 st.set_page_config(
-    page_title="Food Ordering Chatbot",
-    page_icon="food_order"
+    page_title="Cookie's Bot",
+    page_icon=":cookie:"
 )
 
 
@@ -65,43 +65,56 @@ def chatbot():
     response_container=st.container()  
     voice_text=""
     recognizer=sr.Recognizer()
-    def voice_input():
-        with sr.Microphone() as source:
-            with st.spinner("Listening"):
-                audio=recognizer.listen(source)
-        try:
-            text=recognizer.recognize_google(audio)
-            return text
-        except sr.UnknownValueError:
-            st.error("Sorry, I couldn't understand the audio.", icon="🎙️")
-            return ""
-        except sr.RequestError as e:
-            st.error(f"Sorry, there was an error with the request: {e}")
-            return ""
-    # Voice Input Button
-    voice_input_button = st.toggle("Voice Input",key="voice_input_button")
-    # Listen Button
-    listen_button = st.button("Ask via Voice")
-    # Enable the voice input button when the voice text is not empty
-    if voice_text != "":
-        voice_input_button = True
-    # Display an error message if the user clicks the listen button without enabling the voice inputbutton
-    if listen_button and not voice_input_button:
-        st.error("Please enable voice toggle before press listening.",icon="🔴")
-    # Start voice input when the listen button is clicked
-    if listen_button and voice_input_button:
-        voice_text = voice_input()
+    # def voice_input():
+    #     with sr.Microphone() as source:
+    #         with st.spinner("Listening"):
+    #             audio=recognizer.listen(source)
+    #     try:
+    #         text=recognizer.recognize_google(audio)
+    #         return text
+    #     except sr.UnknownValueError:
+    #         st.error("Sorry, I couldn't understand the audio.", icon="🎙️")
+    #         return ""
+    #     except sr.RequestError as e:
+    #         st.error(f"Sorry, there was an error with the request: {e}")
+    #         return ""
+    # # Voice Input Button
+    # voice_input_button = st.toggle("Voice Input",key="voice_input_button")
+    # # Listen Button
+    # listen_button = st.button("Listen")
+    # # Enable the voice input button when the voice text is not empty
+    # if voice_text != "":
+    #     voice_input_button = True
+    # # Display an error message if the user clicks the listen button without enabling the voice inputbutton
+    # if listen_button and not voice_input_button:
+    #     st.error("Please enable voice toggle before press listening.",icon="🔴")
+    # # Start voice input when the listen button is clicked
+    # if listen_button and voice_input_button:
+    #     voice_text = voice_input()
+    
     with st.form("my_form"):
-        query = st.text_input("Query: ", key="my_input", value=voice_text)
-        submit_button = st.form_submit_button("Submit")
-    if submit_button or (voice_text != ""):
-        with st.spinner("typing..."):
-            conversation_string = get_conversation_string()
-            context = find_match(query)
-            response = conversation.predict(input=f"Context:\n {context} \n\n Query:\n{query}")
-            user_input = query
-            st.session_state.requests.append(user_input)
-            st.session_state.responses.append(response)
+        st.markdown("**Chat**")
+        cols = st.columns((6, 1))
+        query = cols[0].text_input(
+            "Chat",
+            value="",
+            label_visibility="collapsed",
+            key="query",
+        )
+        submit=cols[1].form_submit_button(
+            "Submit", 
+            type="primary", 
+              # Pass 'query' as a parameter
+        )
+        if submit:
+            with st.spinner("typing..."):
+                conversation_string = get_conversation_string()
+                context = find_match(query)
+                response = conversation.predict(input=f"Context:\n {context} \n\n Query:\n{query}")
+                user_input = query
+                st.session_state.requests.append(user_input)
+                st.session_state.responses.append(response)
+
             
                 
     
