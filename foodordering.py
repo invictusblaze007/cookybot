@@ -4,7 +4,6 @@ import random
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.conversation.memory import ConversationBufferWindowMemory
 from langchain.chains import ConversationChain
-import speech_recognition as sr
 from utils import find_match
 from utils import get_conversation_string
 from streamlit_chat import message
@@ -15,8 +14,8 @@ import random
 api_key=st.secrets["GPT_API_KEY"]
 
 st.set_page_config(
-    page_title="Cookie's Bot",
-    page_icon=":cookie:"
+    page_title="Food Ordering Chatbot",
+    page_icon="food_order"
 )
 
 
@@ -63,8 +62,8 @@ def chatbot():
     prompt_template=ChatPromptTemplate.from_messages([system_msg_template,MessagesPlaceholder(variable_name="history"),human_msg_template])
     conversation=ConversationChain(memory=st.session_state.buffer_memory,prompt=prompt_template,llm=llm,verbose=True)
     response_container=st.container()  
-    voice_text=""
-    recognizer=sr.Recognizer()
+    # voice_text=""
+    # recognizer=sr.Recognizer()
     # def voice_input():
     #     with sr.Microphone() as source:
     #         with st.spinner("Listening"):
@@ -95,25 +94,19 @@ def chatbot():
     with st.form("my_form"):
         st.markdown("**Chat**")
         cols = st.columns((6, 1))
-        query = cols[0].text_input(
-            "Chat",
-            value="",
-            label_visibility="collapsed",
-            key="query",
-        )
-        submit=cols[1].form_submit_button(
-            "Submit", 
-            type="primary", 
-              # Pass 'query' as a parameter
-        )
-        if submit:
-            with st.spinner("typing..."):
-                conversation_string = get_conversation_string()
-                context = find_match(query)
-                response = conversation.predict(input=f"Context:\n {context} \n\n Query:\n{query}")
-                user_input = query
-                st.session_state.requests.append(user_input)
-                st.session_state.responses.append(response)
+        query = cols[0].text_input("Chat", value="", label_visibility="collapsed", key="query")
+            
+        
+        submit_button = cols[1].form_submit_button("Submit", type="primary")
+          
+    if submit_button:
+        with st.spinner("typing..."):
+            conversation_string = get_conversation_string()
+            context = find_match(query)
+            response = conversation.predict(input=f"Context:\n {context} \n\n Query:\n{query}")
+            user_input = query
+            st.session_state.requests.append(user_input)
+            st.session_state.responses.append(response)
 
             
                 
